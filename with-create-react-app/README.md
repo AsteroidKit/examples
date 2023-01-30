@@ -1,3 +1,8 @@
+# AsteroidKit
+AsteroidsKit is a react library and platform that makes it easy to do web3 authorization.
+
+This project contains example usage of the library. Follow the following guide to get started with the app.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
