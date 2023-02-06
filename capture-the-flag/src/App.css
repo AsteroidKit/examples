@@ -1,0 +1,75 @@
+.App {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  overflow: auto;
+}
+
+.header-menu {
+  display: flex;
+  top: 0;
+  position: sticky;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  height: 48px;
+  background-color: rebeccapurple;
+}
+
+.header-text {
+  color: white;
+  font-weight: 200;
+  font-size: 32px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.content {
+  padding: 8px 16px;
+  overflow: auto;
+  justify-content: center;
+  align-items: center;
+}
+
+button.custom {
+  transition: background-color, 0.3s;
+  background-color: transparent;
+  font-weight: 300;
+  border: 1px solid rebeccapurple;
+  padding: 18px 32px;
+  color: rebeccapurple;
+  border-radius: 4px;
+  width: 100%;
+}
+
+button.primary {
+  background-color: transparent;
+  font-weight: 300;
+  border: 1px solid rebeccapurple;
+  padding: 18px 32px;
+  color: rebeccapurple;
+  border-radius: 4px;
+  width: 100%;
+}
+
+button.secondary {
+  background-color: transparent;
+  font-weight: 300;
+  border: 1px solid rgb(31, 181, 129);
+  padding: 18px 32px;
+  color: rgb(31, 181, 129);
+  border-radius: 4px;
+  width: 100%;
+}
+
+button:disabled {
+  background-color: lightgray;
+}
+
+button.custom:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.053);
+  cursor: pointer;
+}
