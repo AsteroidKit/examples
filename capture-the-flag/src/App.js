@@ -2,14 +2,14 @@ import "./App.css";
 import "asteroidkit/styles.css";
 
 import { AsteroidKitProvider, ConnectButton, createClient } from "asteroidkit";
-import React from "react";
+import React, { useState } from "react";
 
-import {
-  useContractRead,
-  useContractWrite,
-  usePrepareContractWrite,
-  WagmiConfig,
-} from "wagmi";
+import { WagmiConfig } from "wagmi";
+
+import toast from "react-hot-toast";
+
+import { readContract, writeContract, prepareWriteContract } from "@wagmi/core";
+
 import ABI from "./abi.json";
 
 const client = createClient();
@@ -20,19 +20,8 @@ const APP_ID = process.env.REACT_APP_ASTEROIDKIT_APPID;
 const CONTRACT_ADDRESS = "0x7e6f65af39bE92bA720C2477D5c58d3520E348fd";
 
 const Content = () => {
-  const { config } = usePrepareContractWrite({
-    address: CONTRACT_ADDRESS,
-    abi: ABI,
-    functionName: "capture",
-  });
-
-  const { isLoading: isLoadingWrite, write } = useContractWrite(config);
-
-  const { refetch, isRefetching } = useContractRead({
-    address: CONTRACT_ADDRESS,
-    abi: ABI,
-    functionName: "holder",
-  });
+  const [isLoadingRead, setIsloadingRead] = useState(false);
+  const [isLoadingWrite, setIsloadingWrite] = useState(false);
 
   return (
     <div className="container">
@@ -55,27 +44,74 @@ const Content = () => {
         >
           <button
             className="custom secondary"
-            disabled={isRefetching}
+            disabled={isLoadingRead || isLoadingWrite}
             onClick={async () => {
-              const result = await refetch();
-
-              if (!result.data) {
-                throw new Error("Error while fetching");
-              }
-
-              alert("Flag is been held by " + result.data);
+              setIsloadingRead(true);
+              readContract({
+                address: CONTRACT_ADDRESS,
+                abi: ABI,
+                functionName: "holder",
+              })
+                .then((data) => {
+                  toast.custom(
+                    <div
+                      style={{
+                        display: "flex",
+                        padding: "8px 22px",
+                        border: "1px solid black",
+                        transition: "all 0.3s",
+                        borderRadius: 8,
+                        gap: 8,
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        backgroundColor: "white",
+                        boxShadow: "5px 5px 27px -2px rgba(0,0,0,0.39)",
+                      }}
+                    >
+                      <div>Flag is been held by</div>
+                      <b>{data}</b>
+                    </div>
+                  );
+                })
+                .catch((e) => {
+                  console.error(e);
+                  toast.error(
+                    "Error while fecthing contract. Check logs for more details"
+                  );
+                })
+                .finally(() => setIsloadingRead(false));
             }}
           >
             GET WHO'S HOLDING THE FLAG
           </button>
           <button
             className="custom primary"
-            disabled={write === undefined || isLoadingWrite}
-            onClick={() => {
-              write();
+            disabled={isLoadingRead || isLoadingWrite}
+            onClick={async () => {
+              setIsloadingWrite(true);
+
+              const config = await prepareWriteContract({
+                address: CONTRACT_ADDRESS,
+                abi: ABI,
+                functionName: "capture",
+              });
+
+              writeContract(config)
+                .then(async (data) => {
+                  await data.wait();
+                  toast.success("Flag holder updated");
+                })
+                .catch((e) => {
+                  console.error(e);
+                  toast.error(
+                    "Error whilhe calling capture method. Check logs for more details"
+                  );
+                })
+                .finally(() => setIsloadingWrite(false));
             }}
           >
-            CAPTURE THE FLAG
+            {isLoadingWrite ? "WAITING FOR TRANSACTION..." : "CAPTURE THE FLAG"}
           </button>
         </div>
       </div>
